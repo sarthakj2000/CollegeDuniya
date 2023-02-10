@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Bootstrap demo</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.2/axios.min.js"
+      integrity="sha512-NCiXRSV460cHD9ClGDrTbTaw0muWUBf/zB/yLzJavRsPNUl9ODkUVmUHsZtKu17XknhsGlmyVoJxLg/ZQQEeGA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+  </head>
+  <body>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Project Name</th>
+          <th scope="col">Total Campaigns</th>
+          <th scope="col">Total Opens Required</th>
+          <th scope="col">Total Opens Acheived</th>
+          <th scope="col">Total Clicks Required</th>
+          <th scope="col">Total Clicks Acheived</th>
+          <th scope="col">Open Cost</th>
+          <th scope="col">Total Open Cost</th>
+          <th scope="col">Click Cost</th>
+          <th scope="col">Total Clicks Cost</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody id="tablebody">
+        
+      </tbody>
+    </table>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/javascript">
+      const fetchProjects = async () => {
+        let projects = await axios.get("http://localhost:5000/api/project");
+        let tr = ``;
+        projects = projects.data;
+
+        for (let i = 0; i < projects.length; i++) {
+          let campaign = await axios.get(
+            `http://localhost:5000/api/campaign/project/${projects[i]._id}`
+          );
+          campaign = campaign.data;
+          let totalCampaigns = 0;
+          let totalOpensAcheived = 0;
+          let totalClicksAcheived = 0;
+          let totalOpens = 0;
+          let totalCLicks = 0;
+          for (let j = 0; j < campaign.length; j++) {
+            totalCampaigns += 1;
+            totalOpens = campaign[j].open;
+            totalCLicks = campaign[j].clicks;
+          }
+          tr += `<tr>
+          <th scope="row">${projects[i]._id}</th>
+          <td>${projects[i].project_name}</td>
+          <td>${totalCampaigns}</td>
+          <td>${projects[i].target_opens}</td>
+          <td>${totalOpens}</td>
+          <td>${projects[i].target_clicks}</td>
+          <td>${totalCLicks}</td>
+          <td>${projects[i].open_cost * projects[i].target_opens}</td>
+          <td>${projects[i].open_cost}</td>
+          <td>${projects[i].click_cost}</td>
+          <td>${projects[i].click_cost * projects[i].target_clicks}</td>
+          <td>${projects[i].status}</td>
+        </tr>`;
+        }
+        console.log(":vv",tr)
+        document.getElementById("tablebody").innerHTML = tr;
+      };
+      fetchProjects();
+    </script>
+  </body>
+</html>
